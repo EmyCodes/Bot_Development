@@ -1,24 +1,63 @@
 #!/usr/bin/python3
 
 import asyncio
-from sys import argv
-import telegram
-import telegram.ext
+import logging
+from settings import TELEGRAM_BOT_TOKEN
+from telegram import Update
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 
 
-async def main():
-    bot = telegram.Bot(argv[1])
-    async with bot:
-        print(await bot.get_me())
-    #    print((await bot.get_updates())[0])
-        await bot.send_message(text='Hi Emy', chat_id=956127600)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
 
-async def start_callback(update, context):
-    user_says = " ".join(context.args)
-    await update.message.reply_text("You said: " + user_says)
+# Defining Functions
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    This function initializes a conversation with the bot.... 
+    """
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
 
 
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+   """
+    This function guides users on which commands to use....
+   """
+   text = """
+/start    =>       Starts a Convesation with DeepChat
+/todolist =>       Tells DeepChat to get ready for TodoList Creation
+/help     =>       Guidains command 
+"""
+   await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
-if __name__ == '__main__':
-    asyncio.run(main())
+    ################################################################################### 
+    ##                      Here comes DeepChat's Power                              ##
+    ###################################################################################
+
+
+async def todolist_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+        This function gets/fetch info from google calender
+    
+    """
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Hello, this is your to-do list")
+    pass
+
+
+if __name__ == "__main__":
+    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
+    
+    """
+    Command Handlers to handle /start, /help, /todolist and (more to come) commands
+    """
+    start_handler = CommandHandler('start', start_command)
+    help_handler = CommandHandler('help', help_command)
+    todolist_handler = CommandHandler('todolist', todolist_command)
+    application.add_handler(start_handler)
+    application.add_handler(help_handler)
+    application.add_handler(todolist_handler)
+
+    # Polling
+    application.run_polling()
