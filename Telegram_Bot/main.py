@@ -57,7 +57,6 @@ async def todolist_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def custom_reply_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Custom replies function"""
-
     first_name = update.message.from_user.first_name
     message_text = update.effective_message.text
     reply_text = CUSTOM_REPLY.get(message_text)
@@ -66,6 +65,10 @@ async def custom_reply_command(update: Update, context: ContextTypes.DEFAULT_TYP
     else:
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Oops! I don't understand what you mean, {first_name.split()[0]}")
 
+    message_text = update.effective_message.text
+    reply_text = CUSTOM_REPLY.get(message_text)
+    if reply_text:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=reply_text)
 
 
 if __name__ == "__main__":
